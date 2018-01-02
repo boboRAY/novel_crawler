@@ -9,10 +9,12 @@ import time
 
 root_urls = []
 output_dir = './novels/'
+current_title = ''
 
 
 if not os.path.exists(output_dir):
     os.mkdir(output_dir)
+
 
 
 def get_information(url):
@@ -20,8 +22,8 @@ def get_information(url):
     soup = BeautifulSoup(res.text, 'lxml')
     chapter_urls = [urllib.parse.urljoin(url, a['href']) for a in soup.select('.chapterlist a')]
     title = soup.select_one('.ksq_0 h1').text
-    global output_dir
-    output_dir = os.path.join(output_dir, title+'.txt')
+    global current_title
+    current_title = title
     print('now download ', title)
     return title, chapter_urls
 
@@ -48,7 +50,8 @@ def crawl(url):
         articles.append(article)
     pool.close()
     pool.join()
-    with open(output_dir, 'w') as f:
+    global current_title
+    with open(os.path.join(output_dir, current_title+'.txt'), 'w') as f:
         f.write('\n'.join(articles))
 
 
